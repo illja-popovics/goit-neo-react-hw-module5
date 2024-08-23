@@ -1,40 +1,43 @@
-import { useEffect, useState, Suspense } from 'react';
-import { useParams, useNavigate, Link, Route, Routes } from 'react-router-dom';
+import React, { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import styles from './MovieDetailsPage.module.css';
-import MovieCast from '../../components/MovieCast/MovieCast';
-import MovieReviews from '../../components/MovieReviews/MovieReviews';
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
-  const navigate = useNavigate();
   const [movie, setMovie] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const prevLocationRef = useRef(location.state?.from || '/movies'); // Store previous location
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
-      const response = await axios.get(
-        `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
-        {
+      try {
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {
           headers: {
             Authorization: `Bearer ${import.meta.env.VITE_API_READ_ACCESS_TOKEN}`,
           },
-        }
-      );
-      setMovie(response.data);
+        });
+        setMovie(response.data);
+      } catch (error) {
+        console.error('Failed to fetch movie details:', error);
+      }
     };
 
     fetchMovieDetails();
   }, [movieId]);
 
   const handleGoBack = () => {
-    navigate(-1);
+    navigate(prevLocationRef.current); // Navigate back to previous location
   };
 
   if (!movie) return <p>Loading...</p>;
 
   return (
     <div className={styles.container}>
-      <button onClick={handleGoBack} className={styles.goBackButton}>Go back</button>
+      <button onClick={handleGoBack} className={styles.goBackButton}>
+        Go back
+      </button>
       <div className={styles.details}>
         <img
           src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -53,16 +56,15 @@ const MovieDetailsPage = () => {
       <div className={styles.additionalInfo}>
         <h3>Additional information</h3>
         <ul>
-          <li><Link to="cast">Cast</Link></li>
-          <li><Link to="reviews">Reviews</Link></li>
+          <li>
+            <Link to="cast" state={{ from: location.pathname }}>Cast</Link>
+          </li>
+          <li>
+            <Link to="reviews" state={{ from: location.pathname }}>Reviews</Link>
+          </li>
         </ul>
       </div>
-      <Suspense fallback={<p>Loading...</p>}>
-        <Routes>
-          <Route path="cast" element={<MovieCast />} />
-          <Route path="reviews" element={<MovieReviews />} />
-        </Routes>
-      </Suspense>
+      <Outlet /> {/* Renders nested routes */}
     </div>
   );
 };
