@@ -1,0 +1,28 @@
+.container {
+    padding: 20px;
+}
+
+.goBackButton {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.details {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.poster {
+    width: 300px;
+    border-radius: 10px;
+}
+
+.info {
+    max-width: 600px;
+}
+
+.additionalInfo {
+    margin-top: 20px;
+}
