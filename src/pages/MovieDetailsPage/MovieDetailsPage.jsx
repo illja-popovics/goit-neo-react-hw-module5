@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, Outlet, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import styles from './MovieDetailsPage.module.css';
 
@@ -8,7 +8,7 @@ const MovieDetailsPage = () => {
   const [movie, setMovie] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const prevLocationRef = useRef(location.state?.from || '/movies'); // Store previous location
+  const prevLocationRef = useRef(location.state?.from || '/movies');
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -28,7 +28,7 @@ const MovieDetailsPage = () => {
   }, [movieId]);
 
   const handleGoBack = () => {
-    navigate(prevLocationRef.current); // Navigate back to previous location
+    navigate(prevLocationRef.current);
   };
 
   if (!movie) return <p>Loading...</p>;
@@ -39,32 +39,27 @@ const MovieDetailsPage = () => {
         Go back
       </button>
       <div className={styles.details}>
-        <img
-          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-          alt={movie.title}
-          className={styles.poster}
-        />
+        <img src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} />
         <div className={styles.info}>
           <h2>{movie.title}</h2>
           <p>User Score: {movie.vote_average * 10}%</p>
-          <h3>Overview</h3>
-          <p>{movie.overview}</p>
-          <h3>Genres</h3>
-          <p>{movie.genres.map(genre => genre.name).join(', ')}</p>
+          <p>Overview: {movie.overview}</p>
+          <p>Genres: {movie.genres.map(genre => genre.name).join(', ')}</p>
         </div>
       </div>
       <div className={styles.additionalInfo}>
         <h3>Additional information</h3>
         <ul>
           <li>
-            <Link to="cast" state={{ from: location.pathname }}>Cast</Link>
+            <Link to={`cast`} state={{ from: prevLocationRef.current }}>Cast</Link>
           </li>
           <li>
-            <Link to="reviews" state={{ from: location.pathname }}>Reviews</Link>
+            <Link to={`reviews`} state={{ from: prevLocationRef.current }}>Reviews</Link>
           </li>
         </ul>
       </div>
-      <Outlet /> {/* Renders nested routes */}
+      {/* Render nested routes here */}
+      <Outlet />
     </div>
   );
 };
